@@ -12,7 +12,7 @@
     "test:parallel": "cypress run --record --parallel",
     "test:accessibility": "cypress run --env allure=true --spec 'cypress/e2e/accessibility/**'",
     "lint": "eslint cypress --ext .ts",
-    "format": "prettier --write 'cypress/**/*.ts'",
+    "format": "prettier --write \"cypress/**/*.ts\"",
     "allure:generate": "allure generate ./allure-results -o ./reports/allure-report --clean",
     "allure:open": "allure open ./reports/allure-report",
     "report": "npm run allure:generate && npm run allure:open"
@@ -28,6 +28,7 @@
     "cypress": "^13.6.0",
     "cypress-axe": "^1.7.0",
     "eslint": "^8.50.0",
+    "eslint-plugin-cypress": "^3.6.0",
     "prettier": "^3.0.0",
     "typescript": "^5.2.0"
   }
