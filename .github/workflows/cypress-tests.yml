@@ -14,9 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Lint & Format
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
@@ -37,9 +37,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Smoke Tests
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
@@ -59,7 +59,7 @@ jobs:
 
       - name: Upload Smoke Test Artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: smoke-results
           path: |
@@ -72,9 +72,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Regression Tests
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
@@ -94,7 +94,7 @@ jobs:
 
       - name: Upload Regression Test Artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: regression-results
           path: |
@@ -107,9 +107,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Accessibility Tests
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
@@ -129,7 +129,7 @@ jobs:
 
       - name: Upload Accessibility Test Artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: accessibility-results
           path: |
@@ -142,9 +142,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Workflow Tests
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
@@ -164,7 +164,7 @@ jobs:
 
       - name: Upload Workflow Test Artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: workflow-results
           path: |
@@ -179,9 +179,9 @@ jobs:
     needs: [smoke-tests, regression-tests, accessibility-tests, workflow-tests]
     if: always()
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
@@ -196,14 +196,18 @@ jobs:
         run: mkdir -p allure-results
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
 
       - name: Aggregate Allure Results
         run: |
-          cp -r smoke-results/allure-results/* allure-results/ || true
-          cp -r regression-results/allure-results/* allure-results/ || true
-          cp -r accessibility-results/allure-results/* allure-results/ || true
-          cp -r workflow-results/allure-results/* allure-results/ || true
+          mkdir -p allure-results
+          # Copier les résultats depuis le dossier artifacts téléchargé
+          cp -r artifacts/smoke-results/allure-results/* allure-results/ || true
+          cp -r artifacts/regression-results/allure-results/* allure-results/ || true
+          cp -r artifacts/accessibility-results/allure-results/* allure-results/ || true
+          cp -r artifacts/workflow-results/allure-results/* allure-results/ || true
           # Copier la config une dernière fois pour être sûr
           cp -r cypress/support/allure-config/* allure-results/ || true
 
@@ -211,7 +215,7 @@ jobs:
         run: allure generate allure-results -o reports/allure-report --clean
 
       - name: Upload Allure Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: allure-report
           path: reports/allure-report
