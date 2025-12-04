@@ -7,32 +7,38 @@
 export function retryUntil(
   fn: () => Cypress.Chainable,
   options: {
-    maxAttempts?: number
-    delayMs?: number
-    errorMessage?: string
-  } = {}
+    maxAttempts?: number;
+    delayMs?: number;
+    errorMessage?: string;
+  } = {},
 ): Cypress.Chainable {
-  const { maxAttempts = 3, delayMs = 1000, errorMessage = 'Max retry attempts reached' } = options
-  let attempts = 0
+  const {
+    maxAttempts = 3,
+    delayMs = 1000,
+    errorMessage = "Max retry attempts reached",
+  } = options;
+  let attempts = 0;
 
   const attempt = (): Cypress.Chainable => {
-    attempts++
+    attempts++;
     return fn().then(
       // Success
       (result) => result,
       // Failure - retry if attempts remaining
       (error) => {
         if (attempts >= maxAttempts) {
-          throw new Error(`${errorMessage}: ${error.message}`)
+          throw new Error(`${errorMessage}: ${error.message}`);
         }
-        cy.log(`Retry attempt ${attempts}/${maxAttempts} after error: ${error.message}`)
-        cy.wait(delayMs)
-        return attempt()
-      }
-    )
-  }
+        cy.log(
+          `Retry attempt ${attempts}/${maxAttempts} after error: ${error.message}`,
+        );
+        cy.wait(delayMs);
+        return attempt();
+      },
+    );
+  };
 
-  return attempt()
+  return attempt();
 }
 
 /**
@@ -40,12 +46,12 @@ export function retryUntil(
  */
 export function retryClick(
   selector: string,
-  options: { maxAttempts?: number; delayMs?: number } = {}
+  options: { maxAttempts?: number; delayMs?: number } = {},
 ): Cypress.Chainable {
-  return retryUntil(
-    () => cy.get(selector).click(),
-    { ...options, errorMessage: `Failed to click ${selector}` }
-  )
+  return retryUntil(() => cy.get(selector).click(), {
+    ...options,
+    errorMessage: `Failed to click ${selector}`,
+  });
 }
 
 /**
@@ -53,10 +59,10 @@ export function retryClick(
  */
 export function retryUntilVisible(
   selector: string,
-  options: { maxAttempts?: number; delayMs?: number; timeout?: number } = {}
+  options: { maxAttempts?: number; delayMs?: number; timeout?: number } = {},
 ): Cypress.Chainable {
-  const { timeout = 10000 } = options
-  return cy.get(selector, { timeout }).should('be.visible')
+  const { timeout = 10000 } = options;
+  return cy.get(selector, { timeout }).should("be.visible");
 }
 
 /**
@@ -65,27 +71,33 @@ export function retryUntilVisible(
 export function retryRequest(
   requestOptions: Partial<Cypress.RequestOptions>,
   expectedStatus: number = 200,
-  options: { maxAttempts?: number; delayMs?: number } = {}
+  options: { maxAttempts?: number; delayMs?: number } = {},
 ): Cypress.Chainable {
-  const { maxAttempts = 3, delayMs = 1000 } = options
-  let attempts = 0
+  const { maxAttempts = 3, delayMs = 1000 } = options;
+  let attempts = 0;
 
   const attempt = (): Cypress.Chainable => {
-    attempts++
-    return cy.request({ ...requestOptions, failOnStatusCode: false }).then((response) => {
-      if (response.status === expectedStatus) {
-        return response
-      }
-      if (attempts >= maxAttempts) {
-        throw new Error(`Request failed after ${maxAttempts} attempts. Last status: ${response.status}`)
-      }
-      cy.log(`Request returned ${response.status}, retrying (${attempts}/${maxAttempts})...`)
-      cy.wait(delayMs)
-      return attempt()
-    })
-  }
+    attempts++;
+    return cy
+      .request({ ...requestOptions, failOnStatusCode: false })
+      .then((response) => {
+        if (response.status === expectedStatus) {
+          return response;
+        }
+        if (attempts >= maxAttempts) {
+          throw new Error(
+            `Request failed after ${maxAttempts} attempts. Last status: ${response.status}`,
+          );
+        }
+        cy.log(
+          `Request returned ${response.status}, retrying (${attempts}/${maxAttempts})...`,
+        );
+        cy.wait(delayMs);
+        return attempt();
+      });
+  };
 
-  return attempt()
+  return attempt();
 }
 
 /**
@@ -94,12 +106,12 @@ export function retryRequest(
 export function retryType(
   selector: string,
   text: string,
-  options: { maxAttempts?: number; delayMs?: number } = {}
+  options: { maxAttempts?: number; delayMs?: number } = {},
 ): Cypress.Chainable {
-  return retryUntil(
-    () => cy.get(selector).clear().type(text),
-    { ...options, errorMessage: `Failed to type in ${selector}` }
-  )
+  return retryUntil(() => cy.get(selector).clear().type(text), {
+    ...options,
+    errorMessage: `Failed to type in ${selector}`,
+  });
 }
 
 /**
@@ -107,24 +119,32 @@ export function retryType(
  */
 export function pollUntil(
   conditionFn: () => Cypress.Chainable<boolean>,
-  options: { maxAttempts?: number; delayMs?: number; errorMessage?: string } = {}
+  options: {
+    maxAttempts?: number;
+    delayMs?: number;
+    errorMessage?: string;
+  } = {},
 ): Cypress.Chainable {
-  const { maxAttempts = 10, delayMs = 500, errorMessage = 'Condition not met' } = options
-  let attempts = 0
+  const {
+    maxAttempts = 10,
+    delayMs = 500,
+    errorMessage = "Condition not met",
+  } = options;
+  let attempts = 0;
 
   const poll = (): Cypress.Chainable => {
-    attempts++
+    attempts++;
     return conditionFn().then((result) => {
       if (result) {
-        return cy.wrap(true)
+        return cy.wrap(true);
       }
       if (attempts >= maxAttempts) {
-        throw new Error(`${errorMessage} after ${maxAttempts} attempts`)
+        throw new Error(`${errorMessage} after ${maxAttempts} attempts`);
       }
-      cy.wait(delayMs)
-      return poll()
-    })
-  }
+      cy.wait(delayMs);
+      return poll();
+    });
+  };
 
-  return poll()
+  return poll();
 }

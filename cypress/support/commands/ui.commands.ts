@@ -2,14 +2,14 @@
 declare global {
   namespace Cypress {
     interface Chainable {
-      loginUI(email: string, password: string): Chainable<Element>
+      loginUI(email: string, password: string): Chainable<Element>;
     }
   }
 }
 
-import LoginPage from '../../page-objects/pages/login.page'
+import LoginPage from "../../page-objects/pages/login.page";
 
-Cypress.Commands.add('loginUI', (email: string, password: string) => {
-  LoginPage.visit()
-  LoginPage.login(email, password)
-})
+Cypress.Commands.add("loginUI", (email: string, password: string) => {
+  LoginPage.visit();
+  LoginPage.login(email, password);
+});
