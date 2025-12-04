@@ -1,146 +1,128 @@
-# 🛒 DemoWebShop Automation Framework
-> **Cypress • TypeScript • Cucumber • Allure • Modern POM Architecture**
+# 🛒 DemoWebShop – Cypress Automation Framework
 
-Un framework E2E complet, scalable, basé sur **Cypress + TypeScript + Cucumber**, optimisé pour les tests web, API, workflows complexes et reporting avancé.
+Framework complet d’automatisation End-to-End pour le site  
+👉 [https://demowebshop.tricentis.com/](https://demowebshop.tricentis.com/)
 
-Construit pour automatiser le site :  
-👉 [https://demowebshop.tricentis.com](https://demowebshop.tricentis.com)
+Développé avec **Cypress + TypeScript + Cucumber + POM**.
 
-## 🚀 Fonctionnalités Principales
+## 🚀 Fonctionnalités
 
-- 🔥 **Architecture POM moderne et modulaire**
-- 📘 **BDD via Cucumber** avec des scénarios compréhensibles par le métier
-- 🧪 **Tests UI + API** (login, register, cart, orders…)
-- 📁 **Factories & Validators** (test data + validations JSON)
-- 🧱 **Components Models** (Header, Footer, Navbar…)
-- 🤖 **Custom retry & commands avancées**
-- 🔐 **Dossiers Security & Regression**
-- 📦 **Mocks / Intercepts** pour stabiliser les tests
-- 📸 **Allure Report** avec screenshots + vidéos
-- 🧷 **Dossier downloads** pour vérifier les fichiers téléchargés
-- 🧩 **Séparation Steps / Hooks / Assertions**
-- ⚙️ **CI/CD ready** (GitHub Actions / Jenkins)
-- 🌍 **Cross-browser** : Chrome, Edge, Electron, Firefox
-
-## 🛠️ Prérequis
-
-- **Node.js** ≥ 16
-- **npm** ≥ 8
-- **Java** (pour Allure)
-- *Facultatif : Git, Allure CLI*
+- 🧩 **Architecture POM** (pages, composants, modèles)
+- 🥒 **Cucumber BDD** (scénarios .feature)
+- 📑 **Séparation claire des suites** : smoke, regression, workflows, security…
+- 📊 **Allure Reports** (screenshots, vidéos, steps, logs)
+- 🔁 **Retry intelligent** pour éviter les tests flaky
+- 🔐 **API helpers** (login, register via backend)
+- 🌐 **Cross-browser** (Chrome, Edge, Firefox)
+- ⚙️ **CI/CD ready** (GitHub Actions)
+- 🧪 **Mock API** (cy.intercept())
 
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/akremhammamii/Cypress-DemoShopWeb.git
-cd Cypress-DemoShopWeb
+git clone https://github.com/akremhammamii/demowebshop-automation.git
+cd demowebshop-automation
 npm install
 ```
 
-## 🏃 Exécuter les Tests
+## 🏃‍♂️ Exécuter les tests
 
-### � Mode interactif
+### ▶ Mode interactif (Cypress GUI)
 ```bash
-npm run test:open
+npx cypress open
 ```
 
-### 👉 Headless + Allure
+### 🤖 Mode headless (CI)
 ```bash
 npm test
 ```
 
-### 🎯 Exécuter une suite spécifique
+### 🎯 Suites spécifiques
 ```bash
 npm run test:smoke
 npm run test:regression
 npm run test:workflows
 ```
 
-## 📊 Générer et Ouvrir le Rapport Allure
+## 📊 Rapport Allure
 
+Générer & ouvrir le rapport :
 ```bash
 npm run report
 ```
 
-**Fonctionnalités du rapport :**
-- 🔎 Screenshots, vidéos attachées automatiquement
-- 🏷️ Catégories (Timeouts, Product defects…)
-- 📈 Historique et tendances
-- 👁️ Steps détaillés + logs réseau
+**Contient :**
+- Steps détaillés
+- Screenshots
+- Vidéos
+- Historique des exécutions
 
-## 📂 Structure du Projet
+## 📁 Structure du projet
 
 ```
-cypress/
-├── api/                     # API services + models
-│   ├── models/              # Request / response interfaces
-│   └── services/            # API calls (login, register…)
+demowebshop-automation/
 │
-├── downloads/               # Fichiers téléchargés
+├── cypress/
+│   ├── e2e/
+│   │   ├── smoke/
+│   │   ├── regression/
+│   │   ├── security/
+│   │   ├── accessibility/
+│   │   ├── performance/
+│   │   ├── workflows/
+│   │   └── features/            # Cucumber .feature files
+│   │
+│   ├── page-objects/
+│   │   ├── pages/               # LoginPage, RegisterPage...
+│   │   ├── components/          # Header, Footer...
+│   │   ├── api/                 # API services
+│   │   └── models/              # Interfaces TS
+│   │
+│   ├── fixtures/
+│   │   ├── data/                # JSON data
+│   │   ├── factories/           # Fake data
+│   │   └── validators/          # Data validation
+│   │
+│   ├── support/
+│   │   ├── commands/            # Custom commands
+│   │   ├── hooks/               # Cucumber hooks
+│   │   ├── assertions/          # Custom assertions
+│   │   ├── interceptors/        # cy.intercept()
+│   │   ├── selectors/           # Central selectors
+│   │   ├── logger/              # Logs
+│   │   └── retry/               # Retry helpers
+│   │
+│   ├── downloads/               # Downloaded files
+│   └── steps/                   # Step definitions
 │
-├── e2e/
-│   ├── features/            # Scénarios Cucumber
-│   ├── regression/          # Suite regression
-│   ├── security/            # Tests sécurité
-│   └── workflows/           # Scénarios E2E complets
+├── reports/                     # Allure, screenshots, videos
+├── scripts/                     # Utilities (setup, report, seed)
 │
-├── fixtures/                # Données statiques
-│
-├── mocks/                   # Interceptions & stubs
-│
-├── page-objects/
-│   ├── pages/               # Pages POM complètes
-│   ├── components/          # Header, footer, mini-cart, menu…
-│   ├── factories/           # Génération de données dynamiques
-│   ├── validators/          # Validations UI + API
-│   └── utils/               # Helpers + commons
-│
-├── support/
-│   ├── assertions/          # Assertions custom (ex: expectLoginSuccess)
-│   ├── commands/            # Commands Cypress personnalisées
-│   ├── hooks/               # before, after, beforeEach…
-│   ├── step-definitions/    # Steps Cucumber
-│   ├── allure-config/       # Paramétrage allure
-│   └── e2e.ts               # Entrée globale Cypress
-│
-reports/
-├── allure-results/          # Résultats bruts
-├── allure-report/           # Rapport final
-│
-cypress.config.ts
-package.json
+├── cypress.config.ts
+├── package.json
+├── tsconfig.json
+└── README.md
 ```
 
-## 🧩 Scripts Disponibles
+## 🤝 Contribution
 
-```json
-"scripts": {
-  "test:open": "cypress open",
-  "test": "cypress run",
-  "report": "allure generate ./allure-results --clean && allure open",
-  "test:smoke": "cypress run --env suite=smoke",
-  "test:regression": "cypress run --env suite=regression",
-  "test:workflows": "cypress run --env suite=workflows"
-}
-```
-
-## 🤝 Contribuer
-
-1. **Fork** le repo
+1. **Fork** le projet
 2. Crée une branche :
    ```bash
-   git checkout -b feature/ma-feature
+   git checkout -b feature/new-feature
    ```
 3. Commit :
    ```bash
-   git commit -m "Nouvelle fonctionnalité"
+   git commit -m "New feature"
    ```
 4. Push :
    ```bash
-   git push origin feature/ma-feature
+   git push origin feature/new-feature
    ```
 5. Ouvre une **Pull Request**
 
-## ⭐ Support
+## 📧 Contact
 
-Si vous aimez ce framework, n’hésitez pas à mettre une étoile ⭐ sur GitHub !
+**Développé par Akrem Hammami**  
+💼 QA Automation Engineer  
+📬 Disponible sur LinkedIn
