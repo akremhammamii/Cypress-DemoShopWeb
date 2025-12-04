@@ -1,0 +1,34 @@
+{
+  "name": "demowebshop-automation",
+  "version": "1.0.0",
+  "description": "Cypress Enterprise Framework for DemoWebShop",
+  "scripts": {
+    "test": "cypress run --env allure=true",
+    "test:smoke": "cypress run --env allure=true --spec 'cypress/e2e/smoke/**'",
+    "test:regression": "cypress run --env allure=true --spec 'cypress/e2e/regression/**'",
+    "test:workflows": "cypress run --env allure=true --spec 'cypress/e2e/workflows/**'",
+    "test:open": "cypress open --e2e",
+    "test:debug": "cypress run --headed --spec",
+    "test:parallel": "cypress run --record --parallel",
+    "lint": "eslint cypress --ext .ts",
+    "format": "prettier --write 'cypress/**/*.ts'",
+    "allure:copy-config": "powershell -Command \"Copy-Item -Path 'cypress/support/allure-config/*' -Destination 'allure-results/' -Force -ErrorAction SilentlyContinue\"",
+    "allure:generate": "npm run allure:copy-config && allure generate ./allure-results -o ./reports/allure-report --clean",
+    "allure:open": "allure open ./reports/allure-report",
+    "report": "npm run allure:generate && npm run allure:open"
+  },
+  "devDependencies": {
+    "@badeball/cypress-cucumber-preprocessor": "^24.0.0",
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
+    "@faker-js/faker": "^10.1.0",
+    "@shelex/cypress-allure-plugin": "^2.41.2",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "cypress": "^13.6.0",
+    "cypress-axe": "^1.7.0",
+    "eslint": "^8.50.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.2.0"
+  }
+}

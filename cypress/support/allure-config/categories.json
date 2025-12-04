@@ -1,0 +1,41 @@
+[
+    {
+        "name": "Product Defects",
+        "description": "Tests failed due to actual bugs in the application",
+        "messageRegex": ".*AssertionError.*",
+        "matchedStatuses": [
+            "failed"
+        ]
+    },
+    {
+        "name": "Timeout Issues",
+        "description": "Tests failed due to timeouts",
+        "messageRegex": ".*[Tt]imeout.*|.*Timed out.*",
+        "matchedStatuses": [
+            "broken"
+        ]
+    },
+    {
+        "name": "Element Not Found",
+        "description": "Tests failed because elements were not found",
+        "messageRegex": ".*not found.*|.*does not exist.*|.*could not find.*",
+        "matchedStatuses": [
+            "failed",
+            "broken"
+        ]
+    },
+    {
+        "name": "Network Issues",
+        "description": "Tests failed due to network problems",
+        "messageRegex": ".*ERR_.*|.*network.*|.*ECONNREFUSED.*",
+        "matchedStatuses": [
+            "broken"
+        ]
+    },
+    {
+        "name": "Ignored tests",
+        "matchedStatuses": [
+            "skipped"
+        ]
+    }
+]

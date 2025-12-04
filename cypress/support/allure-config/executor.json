@@ -1,0 +1,9 @@
+{
+    "name": "Cypress Test Runner",
+    "type": "cypress",
+    "buildOrder": 1,
+    "buildName": "DemoWebShop Automation #1",
+    "buildUrl": "http://localhost",
+    "reportName": "Cypress E2E Tests",
+    "reportUrl": "http://localhost:54732"
+}

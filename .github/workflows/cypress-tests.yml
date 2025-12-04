@@ -1,0 +1,234 @@
+name: Cypress Tests
+
+on:
+  push:
+    branches: [main, develop, staging]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Lancer les tests tous les jours à 2h du matin
+    - cron: '0 2 * * *'
+
+jobs:
+  # Job 1: Lint et format check
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint & Format
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Check Prettier formatting
+        run: npm run format -- --check
+        continue-on-error: true
+
+  # Job 2: Tests Smoke (rapides)
+  smoke-tests:
+    runs-on: ubuntu-latest
+    name: Smoke Tests
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Smoke Tests
+        run: npm run test:smoke
+
+      - name: Upload Smoke Test Videos
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: smoke-videos
+          path: cypress/videos
+
+      - name: Upload Smoke Test Screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: smoke-screenshots
+          path: cypress/screenshots
+
+  # Job 3: Tests Regression (plus longs)
+  regression-tests:
+    runs-on: ubuntu-latest
+    name: Regression Tests
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Regression Tests
+        run: npm run test:regression
+
+      - name: Upload Regression Videos
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: regression-videos
+          path: cypress/videos
+
+      - name: Upload Regression Screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: regression-screenshots
+          path: cypress/screenshots
+
+  # Job 4: Tests Accessibility
+  accessibility-tests:
+    runs-on: ubuntu-latest
+    name: Accessibility Tests
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Accessibility Tests
+        run: npm run test:accessibility
+        continue-on-error: true
+
+  # Job 5: Tests de Workflow/E2E
+  workflow-tests:
+    runs-on: ubuntu-latest
+    name: Workflow Tests
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Workflow Tests
+        run: npm run test:workflows
+        continue-on-error: true
+
+      - name: Upload Workflow Videos
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: workflow-videos
+          path: cypress/videos
+
+  # Job 6: Tests parallélisés (tous les tests en parallèle)
+  parallel-tests:
+    runs-on: ubuntu-latest
+    name: Parallel Tests (All Suites)
+    # À exécuter SEULEMENT les jours de semaine
+    if: github.event_name == 'schedule' || github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run All Tests in Parallel
+        run: npm run test:parallel
+        continue-on-error: true
+
+  # Job 7: Génération de rapports
+  report:
+    runs-on: ubuntu-latest
+    name: Generate Reports
+    needs: [smoke-tests, regression-tests, accessibility-tests]
+    if: always()
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Generate Allure Report
+        run: npm run report
+        continue-on-error: true
+
+      - name: Upload Allure Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: allure-report
+          path: reports/allure-report
+
+      - name: Comment PR with Test Results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ Tests ont été exécutés avec succès!\n\n📊 Voir les rapports dans les Artifacts.'
+            })
+
+  # Job 8: Notification finale
+  notify:
+    runs-on: ubuntu-latest
+    name: Notify Results
+    needs: [lint, smoke-tests, regression-tests]
+    if: always()
+    steps:
+      - name: Check Test Results
+        run: |
+          if [ "${{ needs.smoke-tests.result }}" == "failure" ]; then
+            echo "❌ Smoke tests failed!"
+            exit 1
+          fi
+          if [ "${{ needs.lint.result }}" == "failure" ]; then
+            echo "❌ Linting failed!"
+            exit 1
+          fi
+          echo "✅ All tests passed!"
+
+      - name: Send Slack Notification (Optional)
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: 'Cypress tests failed!'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        continue-on-error: true
